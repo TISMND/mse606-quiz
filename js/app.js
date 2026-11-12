@@ -34,16 +34,17 @@ async function main() {
     ctx.bank = bank.questions;
     ctx.chapters = bank.chapters;
     ctx.byId = Object.fromEntries(bank.questions.map((q) => [q.id, q]));
-    // Optional glossary: if anything here fails, the app runs exactly as before without it.
-    try {
-      const [g, ui] = await Promise.all([fetch('glossary.json', { cache: 'no-cache' }).then((r) => r.json()), import('./terms-ui.js')]);
-      ctx.glossary = ui.indexGlossary(g);
-      ctx.termsUI = ctx.glossary.terms.length ? ui : null;
-      if (!ctx.termsUI) ctx.glossary = null;
-    } catch (e) {
-      console.warn('[glossary] unavailable', e.message);
-      ctx.glossary = null; ctx.termsUI = null;
-    }
+    // Optional glossary, loaded in the background: the app never waits for it, and if it fails
+    // the app runs exactly as before. When it arrives, the current screen redraws to show it.
+    Promise.all([fetch('glossary.json', { cache: 'no-cache' }).then((r) => r.json()), import('./terms-ui.js')])
+      .then(([g, ui]) => {
+        const glossary = ui.indexGlossary(g);
+        if (!glossary.terms.length) return;
+        ctx.glossary = glossary;
+        ctx.termsUI = ui;
+        ctx.redraw?.();
+      })
+      .catch((e) => console.warn('[glossary] unavailable', e.message));
   } catch (e) {
     root.innerHTML = '<div class="loading">Could not load the questions. Check your connection and reload.</div>';
     return;

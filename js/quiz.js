@@ -90,10 +90,9 @@ export function runQuiz(ctx, questions, mode) {
   document.addEventListener('click', onFooter);
 
   ctx.root.onclick = (e) => {
-    if (ctx.termsUI?.handleTermClick(e, ctx)) {
-      if (e.target.closest('[data-drill]')) { setKeys(null); document.removeEventListener('click', onFooter); }
-      return;
-    }
+    // Leaving for a term drill: release this quiz's handlers *before* the drill registers its own.
+    if (ctx.termsUI && e.target.closest('[data-drill]')) { setKeys(null); document.removeEventListener('click', onFooter); }
+    if (ctx.termsUI?.handleTermClick(e, ctx)) return;
     const t = e.target.closest('button');
     if (!t) return;
     if (t.dataset.act === 'quit') {
