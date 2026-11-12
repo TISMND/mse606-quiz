@@ -136,3 +136,43 @@ test('mergeUsers sums stats, unions skips, keeps later miss times', () => {
   assert.deepEqual(m.misses, { 'ch01-002': 9, 'ch07-002': 1 });
   assert.equal(m.statsResetAt, 10);
 });
+
+import { diffUser, applyDelta } from '../js/logic.js';
+
+test('diffUser + applyDelta: answers made on one device add onto another device\'s newer cloud copy', () => {
+  const start = emptyUser();
+  const laptop = applyAnswer(start, byId('ch07-001'), false, 'practice');      // laptop: one miss
+  const phoneCloud = applyAnswer(applyAnswer(start, byId('ch01-001'), true, 'practice'), byId('ch01-002'), false, 'practice');
+  const merged = applyDelta(phoneCloud, diffUser(start, laptop));
+  assert.deepEqual(merged.stats, { 1: { right: 1, total: 2 }, 7: { right: 0, total: 1 } });
+  assert.ok('ch01-002' in merged.misses && 'ch07-001' in merged.misses);
+});
+
+test('diffUser carries miss removal and skip add/remove', () => {
+  let a = { ...emptyUser(), misses: { 'ch07-001': 5 }, skipped: ['ch01-001'] };
+  let b = applyAnswer(a, byId('ch07-001'), true, 'drill');
+  b = toggleSkip(toggleSkip(b, 'ch01-001', false), 'ch01-002', true);
+  const d = diffUser(a, b);
+  assert.equal(d.misses['ch07-001'], null);
+  assert.deepEqual(d.skipAdd, ['ch01-002']);
+  assert.deepEqual(d.skipRemove, ['ch01-001']);
+  const other = { ...emptyUser(), misses: { 'ch07-001': 5, 'ch09-001': 7 }, skipped: ['ch01-001', 'ch14-001'] };
+  const r = applyDelta(other, d);
+  assert.deepEqual(r.misses, { 'ch09-001': 7 });
+  assert.deepEqual([...r.skipped].sort(), ['ch01-002', 'ch14-001']);
+});
+
+test('diffUser carries a stats reset followed by new answers', () => {
+  const a = { ...emptyUser(), stats: { 1: { right: 3, total: 4 } } };
+  const b = applyAnswer(resetStats(a), byId('ch07-001'), true, 'practice');
+  const d = diffUser(a, b);
+  assert.ok(d.reset > 0);
+  const other = { ...emptyUser(), stats: { 1: { right: 9, total: 9 } } };
+  assert.deepEqual(applyDelta(other, d).stats, { 7: { right: 1, total: 1 } });
+});
+
+test('diffUser of identical users is empty', () => {
+  const u = applyAnswer(emptyUser(), byId('ch07-001'), false, 'practice');
+  const d = diffUser(u, u);
+  assert.deepEqual(d, { reset: null, stats: {}, misses: {}, skipAdd: [], skipRemove: [] });
+});

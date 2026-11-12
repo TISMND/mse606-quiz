@@ -117,3 +117,45 @@ export function mergeUsers(a, b) {
     statsResetAt: resets.length ? Math.max(...resets) : null,
   };
 }
+
+// A delta is what changed between two snapshots of one user, in a form that can be applied on top
+// of a different (e.g. newer, from another device) copy without losing that copy's progress.
+// { reset: number|null, stats: {ch:{right,total}} increments, misses: {id: time|null}, skipAdd, skipRemove }
+export function diffUser(prev, next) {
+  const reset = (next.statsResetAt ?? null) !== (prev.statsResetAt ?? null) ? next.statsResetAt : null;
+  const base = reset != null ? {} : prev.stats || {};
+  const stats = {};
+  for (const [ch, s] of Object.entries(next.stats || {})) {
+    const p = base[ch] || { right: 0, total: 0 };
+    const dr = s.right - p.right, dt = s.total - p.total;
+    if (dr || dt) stats[ch] = { right: dr, total: dt };
+  }
+  const misses = {};
+  for (const [id, t] of Object.entries(next.misses || {})) if ((prev.misses || {})[id] !== t) misses[id] = t;
+  for (const id of Object.keys(prev.misses || {})) if (!(id in (next.misses || {}))) misses[id] = null;
+  const ps = new Set(prev.skipped || []), ns = new Set(next.skipped || []);
+  return {
+    reset, stats, misses,
+    skipAdd: [...ns].filter((id) => !ps.has(id)),
+    skipRemove: [...ps].filter((id) => !ns.has(id)),
+  };
+}
+
+export function applyDelta(user, d) {
+  const u = { ...emptyUser(), ...user };
+  let stats = d.reset != null ? {} : { ...u.stats };
+  for (const [ch, s] of Object.entries(d.stats)) {
+    const p = stats[ch] || { right: 0, total: 0 };
+    stats[ch] = { right: p.right + s.right, total: p.total + s.total };
+  }
+  const misses = { ...u.misses };
+  for (const [id, t] of Object.entries(d.misses)) { if (t == null) delete misses[id]; else misses[id] = t; }
+  const skipped = new Set(u.skipped);
+  d.skipAdd.forEach((id) => skipped.add(id));
+  d.skipRemove.forEach((id) => skipped.delete(id));
+  return { ...u, stats, misses, skipped: [...skipped], statsResetAt: d.reset != null ? d.reset : u.statsResetAt };
+}
+
+export function isEmptyDelta(d) {
+  return d.reset == null && !Object.keys(d.stats).length && !Object.keys(d.misses).length && !d.skipAdd.length && !d.skipRemove.length;
+}

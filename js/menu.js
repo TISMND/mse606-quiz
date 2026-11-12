@@ -76,7 +76,7 @@ export function renderMenu(ctx) {
         }
         break;
       case 'google':
-        try { await ctx.signInGoogle(); toast('Signed in. Your progress now syncs across devices.'); } catch (err) { toast(err.message || 'Sign-in failed.'); }
+        try { if (await ctx.signInGoogle()) toast('Signed in. Your progress now syncs across devices.'); } catch (err) { toast(err.message || 'Sign-in failed.'); }
         break;
       case 'signout':
         if (await confirmModal('Sign out? This device will start a fresh anonymous session.', 'Sign out')) await ctx.signOutUser();
