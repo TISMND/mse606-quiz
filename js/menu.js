@@ -27,9 +27,9 @@ export function renderMenu(ctx) {
     const nSkipped = user.skipped.filter((id) => ctx.byId[id]).length;
     const a = ctx.auth;
     ctx.root.innerHTML = `
-      <div class="brand">MSE 606 · Final prep</div>
-      <h1 class="title">What are we studying?</h1>
+      <h1 class="title">MSE 606 Final Prep</h1>
       <div class="lbl">Chapters</div>
+      <div class="subtitle">Select chapters to study</div>
       <div class="chips">${Object.entries(ctx.chapters).map(([n, t]) =>
         `<button class="chip ${prefs.chapters.includes(+n) ? 'on' : ''}" data-ch="${n}"><b>${n}</b>${esc(t)}</button>`).join('')}</div>
       <div class="minilinks"><button class="link" data-act="all">Select all</button><button class="link" data-act="none">Clear</button></div>
@@ -48,7 +48,7 @@ export function renderMenu(ctx) {
       }).join('')}</div>
       <button class="btn ghost danger" data-act="reset" ${avg == null ? 'disabled' : ''}>Reset stats</button>
       <div class="account">
-        ${!a.cloud ? 'Offline: progress is saved on this device.' : a.isAnonymous
+        ${a.status === 'connecting' ? 'Connecting…' : !a.cloud ? 'Offline: progress is saved on this device.' : a.isAnonymous
           ? 'Progress is saved on this device.<br><button class="link" data-act="google">Sign in with Google</button> to sync across devices.'
           : `Signed in as ${esc(a.displayName || 'Google user')} · <button class="link" data-act="signout">Sign out</button>`}
         <br><button class="link" data-act="skipped">Skipped questions (${nSkipped})</button>

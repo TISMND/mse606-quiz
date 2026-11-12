@@ -13,6 +13,7 @@ let uid = null;             // signed-in uid; null while running local-only
 let prev = null;            // last user snapshot the app was given / saved, for diffing
 let merging = false;        // while true, the auth listener leaves account switching to signInGoogle
 let onUserCb = () => {};
+let status = 'connecting';  // 'connecting' until sign-in resolves, then 'online' or 'offline'
 let unwatch = null;          // live listener on the signed-in user's document
 
 const K_USER = (id) => `mse606.user.${id}`;
@@ -29,7 +30,7 @@ const cacheId = () => uid || ls.get(K_LAST) || 'local';
 
 function authInfo() {
   const u = auth?.currentUser;
-  return { isAnonymous: !u || u.isAnonymous, displayName: u?.displayName || u?.email || null, cloud: !!uid };
+  return { isAnonymous: !u || u.isAnonymous, displayName: u?.displayName || u?.email || null, cloud: !!uid, status };
 }
 
 function hand(user) {
@@ -97,7 +98,9 @@ async function adopt(id) {
 
 export async function initStore(onUser) {
   onUserCb = onUser;
-  const startLocal = () => { if (!prev) hand(normalize(ls.get(K_USER(cacheId())))); };
+  // Show this device's saved copy immediately; the cloud copy replaces it once sign-in finishes.
+  hand(normalize(ls.get(K_USER(cacheId()))));
+  const startLocal = () => { status = 'offline'; hand(prev || normalize(ls.get(K_USER(cacheId())))); };
   try {
     const [app, a, fs] = await Promise.all([
       import(`${SDK}/firebase-app.js`), import(`${SDK}/firebase-auth.js`), import(`${SDK}/firebase-firestore.js`),
@@ -132,6 +135,7 @@ export async function initStore(onUser) {
     }
     clearTimeout(fallback);
     const user = await adopt(u.uid);
+    status = 'online';
     watch(u.uid);
     console.log('[store] signed in', u.uid, u.isAnonymous ? '(anonymous)' : '(google)');
     hand(user);

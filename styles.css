@@ -11,12 +11,16 @@ html { -webkit-text-size-adjust: 100%; }
 body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--display); font-size: 15px; line-height: 1.4; min-height: 100vh; overflow-x: hidden; }
 button { font: inherit; color: inherit; }
 .app { max-width: 680px; margin: 0 auto; padding: 26px 18px calc(var(--footer-h) + 40px); }
-.loading { text-align: center; color: var(--muted); padding-top: 30vh; }
+.loading { text-align: center; color: var(--muted); padding-top: 30vh; font-size: 14px; }
+.spinner { width: 42px; height: 42px; margin: 0 auto 16px; border-radius: 50%; border: 3px solid var(--line); border-top-color: var(--accent); box-shadow: 0 0 18px rgba(124, 247, 197, .25); animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg) } }
+@media (prefers-reduced-motion: reduce) { .spinner { animation-duration: 2.4s; } }
 
 /* headings */
 .brand { text-align: center; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
-.title { text-align: center; font-size: clamp(26px, 6vw, 34px); line-height: 1.1; margin: 6px 0 4px; font-weight: 700; }
-.lbl { display: flex; align-items: center; gap: 12px; justify-content: center; font-size: 15px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: #f4f6ff; margin: 30px 0 14px; text-shadow: 0 0 14px rgba(124, 247, 197, .45); }
+.title { text-align: center; font-size: clamp(32px, 9vw, 46px); line-height: 1.05; margin: 4px 0 0; font-weight: 700; letter-spacing: -.01em; color: #f4f6ff; text-shadow: 0 0 22px rgba(124, 247, 197, .35); }
+.subtitle { text-align: center; font-size: 13.5px; color: var(--muted); margin: -4px 0 14px; }
+.lbl { display: flex; align-items: center; gap: 12px; justify-content: center; font-size: 15px; font-weight: 700; letter-spacing: .22em; text-transform: uppercase; color: #f4f6ff; margin: 38px 0 14px; text-shadow: 0 0 14px rgba(124, 247, 197, .45); }
 .lbl::before, .lbl::after { content: ""; flex: 1; height: 2px; background: linear-gradient(90deg, transparent, var(--accent)); opacity: .7; }
 .lbl::after { background: linear-gradient(90deg, var(--accent), transparent); }
 
