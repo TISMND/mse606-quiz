@@ -1,0 +1,6 @@
+{
+  "name": "mse606-quiz",
+  "private": true,
+  "type": "module",
+  "scripts": { "test": "node --test \"tests/*.test.mjs\"" }
+}
