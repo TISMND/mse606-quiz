@@ -39,3 +39,18 @@ export function validateQuestion(q) {
   }
   return e;
 }
+
+const SLUG = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+export function validateTerm(t) {
+  const e = [];
+  if (!SLUG.test(t.id || '')) e.push('bad id');
+  if (!(t.chapter in CHAPTERS)) e.push('bad chapter');
+  if (blank(t.term)) e.push('empty term');
+  if (blank(t.short)) e.push('empty short');
+  else if (t.short.length > 220) e.push('short too long');
+  if (t.confusedWith !== undefined) {
+    if (!Array.isArray(t.confusedWith) || t.confusedWith.some((c) => !c || !SLUG.test(c.id || '') || blank(c.note))) e.push('bad confusedWith');
+  }
+  return e;
+}
