@@ -14,6 +14,14 @@ export function loadPrefs(ctx) {
 }
 const savePrefs = (p) => { try { localStorage.setItem(PREFS, JSON.stringify(p)); } catch { /* ignore */ } };
 
+function glossaryButton(ctx) {
+  if (!ctx.glossary || !ctx.termsUI) return '';
+  const n = ctx.termsUI.strugglingCount(ctx);
+  return `<button class="btn ghost hl" data-act="glossary">Terms You Struggle With<small>${n
+    ? `${n} term${n === 1 ? '' : 's'} from your misses · full glossary inside`
+    : `Glossary · ${ctx.glossary.terms.length} terms`}</small></button>`;
+}
+
 export function renderMenu(ctx) {
   setFooter(null);
   const prefs = loadPrefs(ctx);
@@ -40,6 +48,7 @@ export function renderMenu(ctx) {
       <div class="lbl">Modes</div>
       <button class="btn ghost" data-act="drill" ${misses ? '' : 'disabled'}>Drill My Wrong Answers<small>${misses ? `${misses} miss${misses === 1 ? '' : 'es'} waiting` : 'No misses waiting'}</small></button>
       <button class="btn ghost" data-act="exam" ${examN ? '' : 'disabled'}>Exam mode<small>${examN} questions · ${examMin} min · feedback at the end</small></button>
+      ${glossaryButton(ctx)}
       <div class="lbl">Stats</div>
       <div class="avg"><b>${pctText(avg)}</b><span>Average score</span></div>
       <div class="bars">${Object.keys(ctx.chapters).map((n) => {
@@ -70,6 +79,7 @@ export function renderMenu(ctx) {
       case 'start': ctx.go('practice', prefs); break;
       case 'drill': ctx.go('drill', prefs); break;
       case 'exam': ctx.go('exam', prefs); break;
+      case 'glossary': ctx.go('glossary'); break;
       case 'reset':
         if (await confirmModal('Reset your scores? Your wrong-answer pool and skipped questions are kept.', 'Reset stats')) {
           ctx.setUser(resetStats(ctx.user)); draw();

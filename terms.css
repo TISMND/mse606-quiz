@@ -1,0 +1,29 @@
+/* Glossary + key terms. Loaded by js/terms-ui.js. Uses the variables from styles.css. */
+.gtitle { text-align: center; font-size: clamp(26px, 7vw, 34px); font-weight: 700; margin: 16px 0 2px; color: #f4f6ff; }
+.gtabs { display: grid; grid-template-columns: 1fr 1fr; border: 1.5px solid var(--line); border-radius: 12px; overflow: hidden; margin: 6px 0 10px; }
+.gtabs button { padding: 10px 4px; font-size: 13.5px; border: 0; background: var(--card); color: var(--ink); cursor: pointer; }
+.gtabs button.on { background: var(--accent); color: #0b1d16; font-weight: 600; }
+.gsearch { width: 100%; border: 1.5px solid var(--line); border-radius: 10px; padding: 11px 12px; font: inherit; font-size: 14px; color: var(--ink); background: #121628; margin-bottom: 12px; }
+.gsearch:focus { outline: none; border-color: var(--accent); }
+.tcard { border: 1.5px solid var(--line); border-radius: 12px; background: var(--card); padding: 12px 13px; margin-bottom: 9px; cursor: pointer; }
+.tcard:hover { border-color: #3c4470; }
+.tcard .tt { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; }
+.tcard .tn { color: var(--good); font-weight: 700; font-size: 16px; }
+.tcard .tc { font-family: var(--mono); font-size: 11px; color: var(--muted); white-space: nowrap; }
+.tcard .td { font-size: 13.5px; line-height: 1.45; color: #cfd3ee; margin-top: 4px; }
+.tcard .tmiss { display: inline-block; margin-top: 7px; font-size: 10.5px; font-weight: 700; letter-spacing: .05em; text-transform: uppercase; color: var(--bad); background: rgba(255, 77, 109, .12); border-radius: 4px; padding: 2px 7px; }
+.tcard.open { border-color: rgba(47, 217, 138, .6); background: #18233a; cursor: default; }
+.tmore { margin-top: 11px; padding-top: 11px; border-top: 1px dashed var(--line); font-size: 13px; line-height: 1.5; color: #cfd3ee; }
+.tmore p { margin: 0 0 4px; }
+.tmore h5 { margin: 10px 0 4px; font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.tmore .tvs b { color: var(--amber); }
+.tmore .ttrap { border-left: 3px solid var(--bad); padding-left: 9px; }
+.tmore .tnone { color: var(--muted); font-size: 12px; }
+.tdrill { display: block; width: 100%; margin-top: 12px; padding: 10px; border-radius: 10px; border: 0; background: var(--accent); color: #0b1d16; font: inherit; font-weight: 600; font-size: 13.5px; cursor: pointer; }
+.kt { margin-top: 30px; }
+.ktbtn { display: flex; justify-content: center; align-items: center; gap: 8px; width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid rgba(124, 247, 197, .55); background: rgba(124, 247, 197, .08); color: var(--accent); font: inherit; font-weight: 600; font-size: 14.5px; cursor: pointer; }
+.ktbtn span { font-family: var(--mono); font-size: 11.5px; background: rgba(124, 247, 197, .18); border-radius: 999px; padding: 1px 8px; }
+.ktlist .lbl { margin-top: 6px; }
+.review .kt { margin-top: 18px; margin-bottom: 8px; }
+.btn.hl { border-color: rgba(124, 247, 197, .55); box-shadow: 0 0 18px rgba(124, 247, 197, .18); }
+.ktbtn[hidden], .ktlist[hidden], .tmore[hidden] { display: none !important; }

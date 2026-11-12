@@ -56,6 +56,7 @@ export function runQuiz(ctx, questions, mode) {
     v.className = `verdict ${correct ? 'good' : 'bad'}`;
     ctx.setUser(applyAnswer(ctx.user, q, correct, mode));
     ctx.logAnswer({ qid: q.id, chapter: q.chapter, picked: [...picked].sort(), correct, mode });
+    if (!correct) ctx.root.querySelector('.qwrap').insertAdjacentHTML('beforeend', ctx.termsUI?.keyTermsHTML(q, ctx) || '');
     pulse(correct ? 'good' : 'bad');
     if (correct) {
       const r = v.getBoundingClientRect();
@@ -89,6 +90,10 @@ export function runQuiz(ctx, questions, mode) {
   document.addEventListener('click', onFooter);
 
   ctx.root.onclick = (e) => {
+    if (ctx.termsUI?.handleTermClick(e, ctx)) {
+      if (e.target.closest('[data-drill]')) { setKeys(null); document.removeEventListener('click', onFooter); }
+      return;
+    }
     const t = e.target.closest('button');
     if (!t) return;
     if (t.dataset.act === 'quit') {
@@ -134,10 +139,13 @@ export function renderSummary(ctx, results, { title, showAll = false } = {}) {
       `<div class="bar"><span class="bn">Ch ${ch}</span><span class="bt"><i style="width:${Math.max((s.right / s.total) * 100, 2)}%;background:${s.right / s.total >= 0.8 ? 'var(--good)' : s.right / s.total >= 0.7 ? 'var(--amber)' : 'var(--bad)'}"></i></span><span class="bp">${s.right}/${s.total}</span></div>`).join('')}</div>
     <div class="lbl">${showAll ? 'Review' : 'Missed'}</div>
     ${list.length ? list.map((r) => `<details class="review"><summary><span class="mark ${r.correct ? 'good' : 'bad'}">${r.correct ? '✓' : '✕'}</span><span>${rich(r.q.stem)}</span></summary>
-      <div class="body"><div class="qtag">${qtag(ctx, r.q)}</div><div class="hint">${hint(r.q)}</div>${reviewOptionsHTML(r.q, r.order, r.picked)}</div></details>`).join('')
+      <div class="body"><div class="qtag">${qtag(ctx, r.q)}</div><div class="hint">${hint(r.q)}</div>${reviewOptionsHTML(r.q, r.order, r.picked)}${r.correct ? '' : ctx.termsUI?.keyTermsHTML(r.q, ctx) || ''}</div></details>`).join('')
       : '<div class="empty">Nothing missed. 🎯</div>'}
     <button class="btn primary" data-act="menu">Back to menu</button>`;
-  ctx.root.onclick = (e) => { if (e.target.closest('[data-act="menu"]')) ctx.go('menu'); };
+  ctx.root.onclick = (e) => {
+    if (ctx.termsUI?.handleTermClick(e, ctx)) return;
+    if (e.target.closest('[data-act="menu"]')) ctx.go('menu');
+  };
   ctx.redraw = null;
   window.scrollTo(0, 0);
 }
