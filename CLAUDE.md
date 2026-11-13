@@ -21,3 +21,7 @@ A study quiz site for Tim's MSE 606 final, shared with classmates. The map of ev
 - **A changed or new question or term gets the independent check before it ships:**
   `work/CHECKER-BRIEF.md` for questions, `work/GLOSSARY-CHECKER-BRIEF.md` for terms.
 - **Firebase stays on the free Spark plan.** Never add billing or Blaze-only products.
+- **Anonymous "Auto clean-up" stays off** (Firebase console → Authentication → Settings). Turning
+  it on deletes anonymous students' progress after 30 days.
+- **The site stays unlisted.** Keep the `noindex` meta in `index.html` and `Disallow: /` in
+  `robots.txt`; it's shared by link only.
